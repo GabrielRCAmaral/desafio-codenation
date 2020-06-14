@@ -1,0 +1,301 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="no-js" lang="pt-br">
+	<head>
+		<meta charset="utf-8" />
+		<title>Codenation Desafio</title>
+		<meta name="description" content="" />
+		<link rel="shortcut icon" type="image/png" href="/favicon.png" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+		<link rel="stylesheet" href="{% static 'css/normalize.css' %}" />
+		<link rel="stylesheet" href="{% static 'css/fontawesome.min.css' %}" />
+		<link rel="stylesheet" href="{% static 'css/main.css' %}" />
+	</head>
+	<body>
+		<header class="navbar">
+			<div class="container">
+				<a href="#" class="navbar__logo">
+					<img src="{% static 'img/9bd98ba.svg' %}"></i>
+				</a>
+				<div class="navbar__menu">
+                    <ul>
+                        <li>
+                            <a href="#desafio">O Desafio</a>
+                        </li>
+                        <li>
+                            <a href="#premissas">Premissas</a>
+                        </li>
+                        <li>
+                            <a href="#implementacao">Implementação</a>
+                        </li>
+                        <li>
+                            <a href="#conclusoes">Conclusões</a>
+                        </li>
+                        <li>
+                            <a href="#sobre">Sobre mim</a>
+                        </li>
+                        <li>
+                            <a href="#contato">Contato</a>
+                        </li>
+                    </ul>
+					
+                </div>
+				
+			</div>
+			
+        </header>
+        
+        <section id="desafio" class="topicos">
+            <h1> Sobre o Desafio</h1>
+            <h2>Objetivo</h2>
+           <p> O objetivo deste produto é fornecer um serviço automatizado que recomenda leads para um usuário dado sua atual lista de clientes (Portfólio).</p> 
+            
+           <h2>Contextualização</h2>
+           <p>Algumas empresas gostariam de saber quem são as demais empresas em um determinado mercado (população) que tem maior probabilidade se tornarem seus próximos clientes. Ou seja, a sua solução deve encontrar no mercado quem são os leads mais aderentes dado as características dos clientes presentes no portfólio do usuário.
+
+            Além disso, sua solução deve ser agnóstica ao usuário. Qualquer usuário com uma lista de clientes que queira explorar esse mercado pode extrair valor do serviço.
+
+            Para o desafio, deverão ser consideradas as seguintes bases:
+
+            <ul>
+                <li>Mercado: Base com informações sobre as empresas do Mercado a ser considerado.</li>
+                <li>Portfolio 1: Ids dos clientes da empresa 1</li> 
+                <li>Portfolio 2: Ids dos clientes da empresa 2 </li>
+                <li>Portfolio 3: Ids dos clientes da empresa 3</li>
+            </ul>
+
+            Obs: todas as empresas(ids) dos portfolios estão contidos no Mercado(base de população).
+        </p> 
+
+        </section>
+        <section id="premissas" class="topicos">
+            <h1>Premissas</h1>
+            <h2>Sistemas de recomendação</h2>
+            <p>
+                Após algumas pesquisas sobre sistemas de recomendações foi encontrado alguns conteúdos interessantes acerca do assunto, de forma sucinta duas formas básicas
+                de se realizar recomendações são:
+                <ul>
+                    <li>
+                        Baseada no conteudo consumido
+                    </li>
+                    <li>
+                        Baseada no conteudo de pessoas com perfis parecidos
+                    </li>
+                </ul>
+                Levando em consideração os dados disponiveis para esse desafio eu decidi que a melhor forma de construir esse sistema seria através
+                das recomendações baseadas pelo conteudo consumido (no caso o portfolio de clientes).
+            </p>
+            <h2>Metodo de avaliação</h2>
+            <p>
+                Um das grandes dificuldades nesse projeto para mim foi definir um metodo para avaliar o modelo. Após dias me questionando, acabei percebendo
+                algumas premissas básicas que adotei nesse projeto:
+                <ul>
+                    <li>
+                        Temos uma base de mercado com mais de 400k possiveis clientes.
+                    </li>
+                    <li>
+                        Temos bases de portfolio na ordem de 500 clientes.
+                    </li>
+                    <li>
+                        Se fizermos um split no portfolio para treinamento e validação, a chance de recomendar um cliente que não está na parte de validação é muito alta!
+                    </li>
+                </ul>
+                O principio basico das premissas foi que reservar uma parte do portfolio para validação nâo é um bom indicador para validar o modelo, isto porque
+                existem muito mais clientes fora do portfolio do que dentro, como o sistema desenvolvido foca em similaridade para fazer recomendações
+                é de se esperar que recomende mais clientes fora do porftolio.
+            </p>
+            <h2>Metodologia</h2>
+            <p>
+                De forma simplista a metodologia utilizada pode ser descrita com os passos abaixo:
+                <ul>
+                    <li>
+                        Excluir features com mais de 20 % da base do mercado.
+                    </li>
+                    <li>
+                        Excluir features categoricas muito desbalanciadas (90% em um categoria).
+                    </li>
+                    <li>
+                        Excluir features categoricas que já estão contidas na forma númerica na base.
+                    </li>
+                    <li>
+                        Excluir features com redundancia de informações, por exemplo (micro região e meso região).
+                    </li>
+                    <li>
+                        Analise do ponto de vista de negocio para as features que sobraram.
+                    </li>
+                    <li>
+                        Aplicação do algoritmo K-means nas baseas de portfolio.
+                    </li>
+                    <li>
+                        Aplicação do algoritmo Nearest Neighbors usando os dados da base do mercado e centroides das de portfolios.
+                    </li>
+                </ul>
+            </p>
+        </section>
+        <section id="implementacao" class="topicos">
+            <h1>Implementação</h1>
+            <h2>Resumo</h2>
+            <p>Para cada portfolio foram gerados 600 recomendações, desdas será apresentado em forma de tabela os números referentes a:
+                <ul>
+                    <li>
+                        Já são clientes: para recomendações que já estão no portfolio.
+                    </li>
+                    <li>
+                        Recomendações repetidas: para casos de recomedar mais de uma vez o mesmo cliente.
+                    </li>
+                    <li>
+                        Potencias clientes: para o número final de clientes recomendados não repetidos e que não são clientes atuais. 
+                    </li>
+                </ul>
+            </p>
+            <h2>Recomendação portfolio 1</h2>
+            <table class="tabela">
+                <tr>
+                    <th>
+                        Já são clientes
+                    </th>
+                    <th>
+                        Recomendações repetidas
+                    </th>
+                    <th>
+                        Potenciais clientes
+                    </th>
+                </tr>
+                <tr>
+
+                    <th>
+                        0
+                    </th>
+                    <th>
+                        0
+                    </th>
+                    <th>
+                        600
+                    </th>
+                </tr>
+            </table>
+            <div>
+                <iframe src="{% static 'data/portfolio1.html' %}" width="100%" height="500px"></iframe>
+            </div>
+            <h2>Recomendação portfolio 2</h2>
+            <table class="tabela">
+                <tr>
+                    <th>
+                        Já são clientes
+                    </th>
+                    <th>
+                        Recomendações repetidas
+                    </th>
+                    <th>
+                        Potenciais clientes
+                    </th>
+                </tr>
+                <tr>
+
+                    <th>
+                        81
+                    </th>
+                    <th>
+                        219
+                    </th>
+                    <th>
+                        300
+                    </th>
+                </tr>
+            </table>
+            <div>
+                <iframe src="{% static 'data/portfolio2.html' %}" width="100%" height="500px"></iframe>
+            </div>
+            <h2>Recomendação portfolio 3</h2>
+            <table class="tabela">
+                <tr>
+                    <th>
+                        Já são clientes
+                    </th>
+                    <th>
+                        Recomendações repetidas
+                    </th>
+                    <th>
+                        Potenciais clientes
+                    </th>
+                </tr>
+                <tr>
+
+                    <th>
+                        64
+                    </th>
+                    <th>
+                        276
+                    </th>
+                    <th>
+                        300
+                    </th>
+                </tr>
+            </table>
+            <div>
+                <iframe src="{% static 'data/portfolio3.html' %}" width="100%" height="500px"></iframe>
+            </div>
+            
+        </section>
+        <section id="conclusoes" class="topicos">
+            <h1>Conclusões</h1>
+            <h2>Dificuldades</h2>
+            <p>
+                Ainda não tinha conhecimentos sobre problemas dessa natureza de clustering e proximidade para recomendação, isso com certeza foi
+                um dos grandes desafios pois foi necessário dedicar um bom tempo estudando sobre o assunto. Na parte de implementação foi encontrada 
+                dificuldades com alocação de memoria para processamento do problema no servidor de deploy, por isso optei por mostrar o resultado final apenas.
+
+            </p>
+            <h2>Aprendizagem</h2>
+            <p>
+                O programa de Aceleração da CodeNation enriqueceu meu midset sobre Data Science com sua metodologia orientada a desafios puder ter um excelente
+                overview (em alguns assuntos até mais profundo) sobre a carreira em Data Science. Concerteza foram as 10 semanas mais bem gastas nessa <Quarentena! class=""></Quarentena!>
+            </p>
+            <h2>Resultado</h2>
+            <p>
+                Como é possível ver pelos mapas gerados na implementação, o sistema acaba recomendando clientes muitos próximos do portfolio. De certa forma 
+                era de se esperar pois a recomendação foi feita em cima dos antigos clientes.
+            </p>
+            <h2>Melhorias</h2>
+            <p>
+                Com uma quantidade maior de portfolios é possível criar um sistema de recomendação baseado em perfis semelhantes de empresas, isto é,
+                recomendar para o portfolio baseado em porftolios parecidos. Também seria possível a criação de um sistema hibrido, onde tanto o histórico
+                do portfolio quanto a comparação com perfis de porftolios parecidos serião considerados na recomendação.
+            </p>
+        </section>
+        <section id="sobre" class="topicos">
+            <h1>Sobre</h1>
+            <div class="descricao">
+                <img src="{% static 'img/foto.jpeg' %}">
+                <p>
+                    Entusiasta em aprender coisas novas em todas as áreas do conhecimento, principalmente sobre técnologia e ciência.<br> Neste último ano
+                    tenho me interessado e dedicado à área de Data Science, cursando pós Big Data Analytics da Mackenzie. 
+                    <br>Adorador de pets sendo pai de 4 filhos: dois cachorros e 2 gatas.<br>
+                    Amante de jogos online competitivo e com multi jogadores.<br>
+                    Atualmente sou estágiario no centro técnologico do banco Itau-Unibanco.
+                    
+                </p>
+            </div>
+            
+        </section>
+            <footer id="contato" >
+                <div class="navbar__menu">
+                    <ul>
+                        <li>
+                            <a href="https://www.linkedin.com/in/gabrielrcamaral/" target="_blank">Linkedin</a>
+                        </li>
+                        <li>
+                            <a href="https://www.facebook.com/amaral.111" target="_blank">Facebook</a>
+                        </li>
+                        <li>
+                            <a href="https://github.com/GabrielRCAmaral" target="_blank">GitHub</a>
+                        </li>
+                        <li>
+                            <a href="https://www.hackerrank.com/gabriel_r_c_ama1" target="_blank">HackRank</a>
+                        </li>
+                    </ul>
+                </div>
+            </footer>
+	</body>
+</html>
